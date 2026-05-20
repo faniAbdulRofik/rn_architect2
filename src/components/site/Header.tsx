@@ -48,13 +48,23 @@ export function Header() {
           : "bg-transparent py-5"
       )}
     >
-      <div className="container mx-auto px-6 flex items-center justify-between">
+      <div className="container mx-auto px-6  flex items-center justify-between">
         <Link href="/" className="flex items-center gap-2 group">
-          <div className="h-8 w-8 rounded-sm bg-gradient-bamboo grid place-items-center text-primary-foreground font-display text-lg leading-none">
-            R
+          {/* Bagian Logo (Gambar) */}
+          <div className="h-8 w-12 rounded-sm overflow-hidden grid place-items-center -translate-y-[2px]">
+            <img
+              src="/RN_Architect.png"
+              alt="RN Architect Logo"
+              width={40}
+              height={40}
+              className="w-full h-full object-contain"
+            />
           </div>
-          <span className="font-display text-xl tracking-tight">
-            RN<span className="text-primary">_</span>ARCHITECT
+
+          {/* Bagian Teks */}
+          {/* Tambahkan translate-y-[Xpx] di sini untuk menaikkan/menurunkan teks */}
+          <span className="font-display text-xl tracking-tight translate-y-[2px]">
+            ARCHITECT
           </span>
         </Link>
 

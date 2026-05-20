@@ -1,13 +1,10 @@
 import Link from "next/link";
 import { ArrowRight, Award, Compass, Hammer, Home as HomeIcon, Layers, MessageCircle, Sparkles } from "lucide-react";
 import { SiteLayout } from "@/components/site/SiteLayout";
-import { SITE, waLink } from "@/lib/site";
+import { waLink } from "@/lib/site";
+import { supabase } from "@/integrations/supabase/client";
+import { resolveAsset } from "@/lib/assets";
 import hero from "@/assets/hero-architecture.jpg";
-import project1 from "@/assets/project-1.jpg";
-import project2 from "@/assets/project-2.jpg";
-import product1 from "@/assets/product-1.jpg";
-import product2 from "@/assets/product-2.jpg";
-import product3 from "@/assets/product-3.jpg";
 
 const services = [
   { icon: Compass, title: "Desain Arsitektur", desc: "Perancangan rumah, vila, dan ruang komersial dengan pendekatan kontekstual." },
@@ -19,7 +16,7 @@ const services = [
 const stats = [
   { v: "120+", l: "Proyek Selesai" },
   { v: "12", l: "Tahun Pengalaman" },
-  { v: "98%", l: "Klien Puas" },
+  { v: "100%", l: "Klien Puas" },
   { v: "24", l: "Penghargaan" },
 ];
 
@@ -29,7 +26,24 @@ const testimonials = [
   { name: "Bu Maya", role: "Interior Custom", quote: "Lemari custom-nya jadi favorit di rumah. Material dan finishing kelas premium." },
 ];
 
-export default function HomePage() {
+export default async function HomePage() {
+  // Load featured projects and products from database
+  const { data: featuredProjects } = await supabase
+    .from("projects")
+    .select("slug, title, category, location, year, cover_image, images")
+    .eq("status", "published")
+    .eq("is_featured", true)
+    .order("created_at", { ascending: false })
+    .limit(2);
+
+  const { data: featuredProducts } = await supabase
+    .from("products")
+    .select("slug, title, category, images, price_label")
+    .eq("status", "published")
+    .eq("is_featured", true)
+    .order("created_at", { ascending: false })
+    .limit(3);
+
   return (
     <SiteLayout>
       {/* HERO with autoplay video */}
@@ -54,7 +68,7 @@ export default function HomePage() {
         <div className="absolute inset-0 bg-gradient-hero" />
         <div className="absolute inset-0 bg-black/35" />
 
-        <div className="relative container mx-auto px-6 py-32 text-cream">
+        <div className="relative container mx-auto px-6 text-cream">
           <p className="reveal text-xs tracking-[0.3em] uppercase text-bamboo-soft mb-6">
             Studio Arsitektur · Est. 2013
           </p>
@@ -93,8 +107,8 @@ export default function HomePage() {
       </section>
 
       {/* PHILOSOPHY */}
-      <section className="py-28 bg-gradient-warm">
-        <div className="container mx-auto px-6 grid md:grid-cols-2 gap-16 items-center">
+      <section className="py-10 bg-gradient-warm">
+        <div className="container mx-auto px-6 grid md:grid-cols-2 gap-10 items-center">
           <div>
             <p className="text-xs tracking-[0.3em] uppercase text-primary mb-4">Filosofi</p>
             <h2 className="text-4xl md:text-5xl text-balance leading-tight">
@@ -110,9 +124,9 @@ export default function HomePage() {
       </section>
 
       {/* SERVICES */}
-      <section className="py-28">
+      <section className="py-10">
         <div className="container mx-auto px-6">
-          <div className="flex flex-wrap items-end justify-between gap-6 mb-14">
+          <div className="flex flex-wrap items-end justify-between gap-6 mb-9">
             <div>
               <p className="text-xs tracking-[0.3em] uppercase text-primary mb-3">Layanan</p>
               <h2 className="text-4xl md:text-5xl">Apa yang kami kerjakan</h2>
@@ -136,9 +150,9 @@ export default function HomePage() {
       </section>
 
       {/* PROJECTS */}
-      <section className="py-28 bg-secondary/40">
+      <section className="py-10 bg-secondary/40">
         <div className="container mx-auto px-6">
-          <div className="flex flex-wrap items-end justify-between gap-6 mb-14">
+          <div className="flex flex-wrap items-end justify-between gap-6 mb-9">
             <div>
               <p className="text-xs tracking-[0.3em] uppercase text-primary mb-3">Portofolio</p>
               <h2 className="text-4xl md:text-5xl">Proyek terpilih</h2>
@@ -147,33 +161,50 @@ export default function HomePage() {
               Lihat semua <ArrowRight className="h-4 w-4" />
             </Link>
           </div>
-          <div className="grid md:grid-cols-2 gap-6">
-            {[
-              { slug: "bamboo-court-house", img: project1, title: "Bamboo Court House", meta: "Residensial · Bandung · 2024" },
-              { slug: "atelier-office", img: project2, title: "Atelier Office", meta: "Komersial · Jakarta · 2023" },
-            ].map((p) => (
-              <Link
-                key={p.title}
-                href={`/projects/${p.slug}`}
-                className="group overflow-hidden rounded-lg bg-card shadow-soft block"
-              >
-                <div className="aspect-[4/3] overflow-hidden">
-                  <img src={p.img.src} alt={p.title} loading="lazy" className="h-full w-full object-cover transition-smooth group-hover:scale-105" />
-                </div>
-                <div className="p-6">
-                  <h3 className="text-2xl">{p.title}</h3>
-                  <p className="text-sm text-muted-foreground mt-1">{p.meta}</p>
-                </div>
-              </Link>
-            ))}
+          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
+            {featuredProjects && featuredProjects.length > 0 ? (
+              featuredProjects.map((p) => (
+                <Link
+                  key={p.slug}
+                  href={`/projects/${p.slug}`}
+                  className="group block rounded-lg overflow-hidden bg-card border border-border hover:shadow-elegant transition-smooth"
+                >
+                  <div className="aspect-square overflow-hidden bg-muted">
+                    <img
+                      src={resolveAsset(p.cover_image || p.images[0])}
+                      alt={p.title}
+                      loading="lazy"
+                      className="h-full w-full object-cover transition-smooth group-hover:scale-105"
+                    />
+                  </div>
+                  <div className="p-5">
+                    <div className="flex items-start justify-between gap-2">
+                      <div>
+                        <h3 className="text-lg leading-snug">{p.title}</h3>
+                        <p className="text-xs text-muted-foreground mt-1">
+                          {p.category}
+                          {p.location ? ` · ${p.location}` : ""}
+                          {p.year ? ` · ${p.year}` : ""}
+                        </p>
+                      </div>
+                      <ArrowRight className="h-4 w-4 text-muted-foreground group-hover:text-primary transition-smooth" />
+                    </div>
+                  </div>
+                </Link>
+              ))
+            ) : (
+              <div className="col-span-3 text-center py-12 text-muted-foreground">
+                Belum ada proyek featured
+              </div>
+            )}
           </div>
         </div>
       </section>
 
       {/* PRODUCTS */}
-      <section className="py-28">
+      <section className="py-10">
         <div className="container mx-auto px-6">
-          <div className="flex flex-wrap items-end justify-between gap-6 mb-14">
+          <div className="flex flex-wrap items-end justify-between gap-6 mb-9">
             <div>
               <p className="text-xs tracking-[0.3em] uppercase text-primary mb-3">Katalog</p>
               <h2 className="text-4xl md:text-5xl">Produk interior custom</h2>
@@ -183,34 +214,44 @@ export default function HomePage() {
             </Link>
           </div>
           <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
-            {[
-              { slug: "meja-makan-solid-oak", img: product1, title: "Meja Makan Solid Oak", tag: "Custom Available" },
-              { slug: "lemari-walnut-4-pintu", img: product2, title: "Lemari Walnut 4 Pintu", tag: "Custom Available" },
-              { slug: "sofa-velvet-bamboo", img: product3, title: "Sofa Velvet Bamboo", tag: "Ready Stock" },
-            ].map((p) => (
-              <Link
-                key={p.title}
-                href={`/products/${p.slug}`}
-                className="group block rounded-lg overflow-hidden bg-card border border-border hover:shadow-elegant transition-smooth"
-              >
-                <div className="aspect-square bg-muted overflow-hidden">
-                  <img src={p.img.src} alt={p.title} loading="lazy" className="h-full w-full object-cover transition-smooth group-hover:scale-105" />
-                </div>
-                <div className="p-5 flex items-center justify-between">
-                  <div>
-                    <h3 className="text-lg">{p.title}</h3>
-                    <span className="text-xs text-primary">{p.tag}</span>
+            {featuredProducts && featuredProducts.length > 0 ? (
+              featuredProducts.map((p) => (
+                <Link
+                  key={p.slug}
+                  href={`/products/${p.slug}`}
+                  className="group block rounded-lg overflow-hidden bg-card border border-border hover:shadow-elegant transition-smooth"
+                >
+                  <div className="aspect-square bg-muted overflow-hidden">
+                    {p.images[0] && (
+                      <img
+                        src={resolveAsset(p.images[0])}
+                        alt={p.title}
+                        loading="lazy"
+                        className="h-full w-full object-cover transition-smooth group-hover:scale-105"
+                      />
+                    )}
                   </div>
-                  <ArrowRight className="h-4 w-4 text-muted-foreground group-hover:text-primary transition-smooth" />
-                </div>
-              </Link>
-            ))}
+                  <div className="p-5 flex items-center justify-between">
+                    <div>
+                      <h3 className="text-lg">{p.title}</h3>
+                      <span className="text-xs text-primary">
+                      </span>
+                    </div>
+                    <ArrowRight className="h-4 w-4 text-muted-foreground group-hover:text-primary transition-smooth" />
+                  </div>
+                </Link>
+              ))
+            ) : (
+              <div className="col-span-3 text-center py-12 text-muted-foreground">
+                Belum ada produk featured
+              </div>
+            )}
           </div>
         </div>
       </section>
 
       {/* TESTIMONIALS */}
-      <section className="py-28 bg-bamboo-deep text-cream">
+      <section className="py-10 bg-bamboo-deep text-cream">
         <div className="container mx-auto px-6">
           <p className="text-xs tracking-[0.3em] uppercase text-bamboo-soft mb-3">Testimoni</p>
           <h2 className="text-4xl md:text-5xl mb-14 max-w-2xl">Apa kata mereka</h2>
@@ -231,8 +272,8 @@ export default function HomePage() {
       </section>
 
       {/* CTA */}
-      <section className="py-28">
-        <div className="container mx-auto px-6">
+      <section className="py-20">
+        <div className="container mx-auto px-40">
           <div className="rounded-2xl bg-gradient-bamboo text-primary-foreground p-12 md:p-20 text-center shadow-elegant">
             <Award className="h-10 w-10 mx-auto mb-6 text-bamboo-soft" />
             <h2 className="text-4xl md:text-5xl text-cream max-w-3xl mx-auto text-balance">

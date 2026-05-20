@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
+import { ArrowUpRight } from "lucide-react";
 import { SiteLayout } from "@/components/site/SiteLayout";
 import { supabase } from "@/integrations/supabase/client";
 import { resolveAsset } from "@/lib/assets";
@@ -44,24 +45,24 @@ export default function ProjectsPage() {
 
   return (
     <SiteLayout>
-      <section className="pt-32 md:pt-40 pb-10 bg-gradient-warm">
-        <div className="container mx-auto px-6 max-w-4xl">
-          <p className="text-xs tracking-[0.3em] uppercase text-primary mb-3">Portofolio</p>
-          <h1 className="text-4xl md:text-7xl text-balance leading-tight">Proyek terpilih</h1>
+      <section className="pt-32 md:pt-20 pb-10 bg-gradient-warm">
+        <div className="container mx-auto px-6 max-w-4xl text-center">
+          <h1 className="text-4xl md:text-6xl text-balance leading-tight">
+            Proyek terpilih
+          </h1>
         </div>
       </section>
 
       <div className="sticky top-14 md:top-16 z-30 bg-background/90 backdrop-blur border-b border-border/70">
-        <div className="container mx-auto px-6 py-2.5 flex flex-wrap gap-1.5">
+        <div className="container mx-auto px-6 py-4 flex flex-wrap gap-3">
           {cats.map((cat) => (
             <button
               key={cat}
               onClick={() => setC(cat)}
-              className={`px-3 py-1.5 rounded-full text-xs font-medium transition-smooth whitespace-nowrap ${
-                c === cat
+              className={`px-3 py-1.5 rounded-full text-xs font-medium transition-smooth whitespace-nowrap ${c === cat
                   ? "bg-primary text-primary-foreground"
                   : "bg-secondary/70 hover:bg-secondary text-foreground/80"
-              }`}
+                }`}
             >
               {cat}
             </button>
@@ -69,23 +70,23 @@ export default function ProjectsPage() {
         </div>
       </div>
 
-      <section className="py-14">
+      <section className="py-8">
         <div className="container mx-auto px-6">
           {loading ? (
-            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
               {Array.from({ length: 6 }).map((_, i) => (
-                <div key={i} className="aspect-[4/3] bg-muted animate-pulse rounded-lg" />
+                <div key={i} className="aspect-square bg-muted animate-pulse rounded-lg" />
               ))}
             </div>
           ) : (
-            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
               {list.map((p) => (
                 <Link
                   key={p.id}
                   href={`/projects/${p.slug}`}
-                  className={`group block ${p.is_featured ? "lg:col-span-2" : ""}`}
+                  className="group block rounded-lg overflow-hidden bg-card border border-border hover:shadow-elegant transition-smooth"
                 >
-                  <div className="overflow-hidden rounded-lg bg-muted aspect-[4/3] relative">
+                  <div className="aspect-square overflow-hidden bg-muted relative">
                     <img
                       src={resolveAsset(p.cover_image || p.images[0])}
                       alt={p.title}
@@ -98,13 +99,18 @@ export default function ProjectsPage() {
                       </span>
                     )}
                   </div>
-                  <div className="mt-4">
-                    <h3 className="text-2xl">{p.title}</h3>
-                    <p className="text-sm text-muted-foreground mt-1">
-                      {p.category}
-                      {p.location ? ` · ${p.location}` : ""}
-                      {p.year ? ` · ${p.year}` : ""}
-                    </p>
+                  <div className="p-5">
+                    <div className="flex items-start justify-between gap-2">
+                      <div>
+                        <h3 className="text-lg leading-snug">{p.title}</h3>
+                        <p className="text-xs text-muted-foreground mt-1">
+                          {p.category}
+                          {p.location ? ` · ${p.location}` : ""}
+                          {p.year ? ` · ${p.year}` : ""}
+                        </p>
+                      </div>
+                      <ArrowUpRight className="h-4 w-4 text-muted-foreground group-hover:text-primary transition-smooth" />
+                    </div>
                   </div>
                 </Link>
               ))}

@@ -27,23 +27,18 @@ const timeline = [
 export default function AboutPage() {
   return (
     <SiteLayout>
-      <section className="pt-40 pb-24 bg-gradient-warm">
-        <div className="container mx-auto px-6 max-w-4xl">
-          <p className="text-xs tracking-[0.3em] uppercase text-primary mb-4">Tentang</p>
-          <h1 className="text-5xl md:text-7xl text-balance leading-tight">
-            Studio kecil yang percaya pada kerja yang <em className="text-primary not-italic">teliti</em>.
+      <section className="pt-32 md:pt-20 pb-10 bg-gradient-warm">
+        <div className="container mx-auto px-6 text-center">
+          <h1 className="text-5xl md:text-6xl text-balance leading-tight max-w-4xl mx-auto">
+            Studio arsitektur yang {" "}
+            <em className="text-primary not-italic">percaya pada kerja yang teliti</em>
           </h1>
-          <p className="mt-8 text-lg text-muted-foreground leading-relaxed max-w-2xl">
-            RN_ARCHITECT adalah studio arsitektur dan interior yang berbasis di Jakarta. Kami
-            mengerjakan jumlah proyek terbatas setiap tahun, agar setiap klien mendapat perhatian
-            penuh dari awal hingga serah terima.
-          </p>
         </div>
       </section>
 
-      <section className="py-24">
+      <section className="py-10">
         <div className="container mx-auto px-6">
-          <h2 className="text-3xl md:text-4xl mb-12">Nilai yang kami pegang</h2>
+          <h2 className="text-3xl md:text-4xl mb-9">Nilai yang kami pegang</h2>
           <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
             {values.map((v) => (
               <div key={v.title} className="p-8 rounded-lg border border-border bg-card">
@@ -56,10 +51,10 @@ export default function AboutPage() {
         </div>
       </section>
 
-      <section className="py-24 bg-secondary/40">
-        <div className="container mx-auto px-6 max-w-3xl">
-          <h2 className="text-3xl md:text-4xl mb-12">Perjalanan</h2>
-          <ol className="relative border-l border-primary/30 pl-8 space-y-10">
+      <section className="py-10 bg-secondary/40">
+        <div className="container mx-auto px-6">
+          <h2 className="text-3xl md:text-4xl mb-9">Perjalanan</h2>
+          <ol className="relative border-l border-primary/30 pl-8 space-y-10 max-w-3xl">
             {timeline.map((t) => (
               <li key={t.y} className="relative">
                 <span className="absolute -left-[42px] top-1 h-3 w-3 rounded-full bg-primary" />

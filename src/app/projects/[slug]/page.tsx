@@ -2,7 +2,18 @@
 
 import Link from "next/link";
 import { useEffect, useState } from "react";
-import { ArrowLeft, Calendar, Clock, MapPin, User, Layers, Lightbulb, MessageCircle } from "lucide-react";
+import { 
+  ArrowLeft, 
+  Calendar, 
+  Clock, 
+  MapPin, 
+  User, 
+  Layers, 
+  Lightbulb, 
+  MessageCircle,
+  Building2,
+  Award
+} from "lucide-react";
 import { SiteLayout } from "@/components/site/SiteLayout";
 import { MediaCarousel, type MediaSlide } from "@/components/site/MediaCarousel";
 import { supabase } from "@/integrations/supabase/client";
@@ -26,23 +37,45 @@ type Project = {
   cover_image: string | null;
 };
 
-export default function ProjectDetail({ params }: { params: { slug: string } }) {
+export default function ProjectDetail({ params }: { params: Promise<{ slug: string }> }) {
   const [p, setP] = useState<Project | null>(null);
   const [loading, setLoading] = useState(true);
   const [missing, setMissing] = useState(false);
 
   useEffect(() => {
-    supabase
-      .from("projects")
-      .select("*")
-      .eq("slug", params.slug)
-      .maybeSingle()
-      .then(({ data }) => {
-        if (!data) setMissing(true);
-        else setP(data as unknown as Project);
+    const loadProject = async () => {
+      try {
+        const resolvedParams = await params;
+        console.log("Loading project with slug:", resolvedParams.slug);
+        
+        const { data, error } = await supabase
+          .from("projects")
+          .select("*")
+          .eq("slug", resolvedParams.slug)
+          .maybeSingle();
+
+        console.log("Project query result:", { data, error });
+
+        if (error) {
+          console.error("Error loading project:", error);
+          setMissing(true);
+        } else if (!data) {
+          console.log("No project found with slug:", resolvedParams.slug);
+          setMissing(true);
+        } else {
+          console.log("Project loaded successfully:", data);
+          setP(data as unknown as Project);
+        }
+      } catch (err) {
+        console.error("Exception loading project:", err);
+        setMissing(true);
+      } finally {
         setLoading(false);
-      });
-  }, [params.slug]);
+      }
+    };
+
+    loadProject();
+  }, [params]);
 
   if (loading) {
     return (
@@ -53,12 +86,27 @@ export default function ProjectDetail({ params }: { params: { slug: string } }) 
       </SiteLayout>
     );
   }
+  
   if (missing || !p) {
     return (
       <SiteLayout>
         <div className="pt-40 pb-32 container mx-auto px-6 text-center">
-          <h1 className="text-3xl mb-2">Proyek tidak ditemukan</h1>
-          <Link href="/projects" className="text-primary">Kembali ke portofolio</Link>
+          <div className="max-w-md mx-auto">
+            <div className="h-20 w-20 rounded-full bg-muted grid place-items-center mx-auto mb-6">
+              <Building2 className="h-10 w-10 text-muted-foreground" />
+            </div>
+            <h1 className="text-3xl font-bold mb-3">Proyek tidak ditemukan</h1>
+            <p className="text-muted-foreground mb-6">
+              Proyek yang Anda cari tidak tersedia atau telah dihapus dari portfolio kami.
+            </p>
+            <Link 
+              href="/projects" 
+              className="inline-flex items-center gap-2 px-6 py-3 rounded-full bg-primary text-primary-foreground hover:opacity-90 transition-smooth"
+            >
+              <ArrowLeft className="h-4 w-4" />
+              Kembali ke portofolio
+            </Link>
+          </div>
         </div>
       </SiteLayout>
     );
@@ -76,84 +124,145 @@ export default function ProjectDetail({ params }: { params: { slug: string } }) 
     { icon: Calendar, label: "Tahun", value: p.year?.toString() },
     { icon: Clock, label: "Durasi", value: p.duration },
     { icon: User, label: "Client", value: p.client },
-    { icon: Layers, label: "Material", value: p.materials },
     { icon: Lightbulb, label: "Konsep", value: p.concept },
   ].filter((f) => f.value);
 
   return (
     <SiteLayout>
-      {/* Hero header */}
-      <section className="pt-28 md:pt-36 pb-10">
-        <div className="container mx-auto px-6 max-w-5xl">
-          <Link
-            href="/projects"
-            className="inline-flex items-center gap-1.5 text-xs uppercase tracking-widest text-muted-foreground hover:text-primary transition-smooth"
-          >
-            <ArrowLeft className="h-3.5 w-3.5" /> Portofolio
-          </Link>
-          <p className="mt-6 text-xs tracking-[0.3em] uppercase text-primary mb-3">{p.category}</p>
-          <h1 className="text-4xl md:text-6xl text-balance leading-tight">{p.title}</h1>
-          {p.short_desc && (
-            <p className="mt-5 text-lg text-muted-foreground max-w-2xl leading-relaxed">
-              {p.short_desc}
-            </p>
-          )}
+      {/* Breadcrumb */}
+      <section className="pt-28 md:pt-32 pb-6">
+        <div className="container mx-auto px-6 max-w-7xl">
+          <div className="flex items-center gap-2 text-sm text-muted-foreground">
+            <Link href="/" className="hover:text-primary transition-smooth">Home</Link>
+            <span>/</span>
+            <Link href="/projects" className="hover:text-primary transition-smooth">Portfolio</Link>
+            <span>/</span>
+            <span className="text-foreground">{p.title}</span>
+          </div>
         </div>
       </section>
 
+      {/* Hero header */}
+      <section className="pb-12">
+        <div className="container mx-auto px-6 max-w-7xl">
+          <div className="max-w-4xl">
+            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 border border-primary/20 mb-6">
+              <Award className="h-3.5 w-3.5 text-primary" />
+              <span className="text-xs font-medium tracking-wider uppercase text-primary">
+                {p.category}
+              </span>
+            </div>
+            <h1 className="text-4xl md:text-6xl lg:text-7xl font-bold text-balance leading-tight mb-6">
+              {p.title}
+            </h1>
+            {p.short_desc && (
+              <p className="text-lg md:text-xl text-muted-foreground leading-relaxed">
+                {p.short_desc}
+              </p>
+            )}
+          </div>
+        </div>
+      </section>
+
+      {/* Gallery */}
       <section className="pb-16">
-        <div className="container mx-auto px-6 max-w-6xl">
+        <div className="container mx-auto px-6 max-w-7xl">
           <MediaCarousel slides={slides} title={p.title} />
         </div>
       </section>
 
-      {/* Facts strip */}
-      <section className="py-12 bg-secondary/40 border-y border-border">
-        <div className="container mx-auto px-6">
-          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-6">
-            {facts.map((f) => (
-              <div key={f.label}>
-                <div className="flex items-center gap-2 text-primary mb-2">
-                  <f.icon className="h-4 w-4" />
-                  <span className="text-[10px] uppercase tracking-widest">{f.label}</span>
+      {/* Project Facts */}
+      {facts.length > 0 && (
+        <section className="py-10 bg-secondary/30 border-y border-border">
+          <div className="container mx-auto px-6 max-w-7xl">
+            <h2 className="text-sm uppercase tracking-widest text-muted-foreground mb-8">
+              Detail Proyek
+            </h2>
+            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-20">
+              {facts.map((f) => (
+                <div key={f.label} className="space-y-3">
+                  <div className="h-12 w-12 rounded-xl bg-primary/10 grid place-items-center">
+                    <f.icon className="h-6 w-6 text-primary" />
+                  </div>
+                  <div>
+                    <div className="text-[10px] uppercase tracking-widest text-muted-foreground mb-1.5">
+                      {f.label}
+                    </div>
+                    <div className="text-sm font-medium leading-snug">{f.value}</div>
+                  </div>
                 </div>
-                <div className="text-sm font-medium">{f.value}</div>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* Storytelling */}
-      {p.description && (
-        <section className="py-20">
-          <div className="container mx-auto px-6 max-w-3xl">
-            <h2 className="text-3xl md:text-4xl mb-6 text-balance">Cerita di balik proyek</h2>
-            <p className="text-lg text-muted-foreground leading-relaxed whitespace-pre-line">
-              {p.description}
-            </p>
+              ))}
+            </div>
           </div>
         </section>
       )}
 
-      {/* CTA */}
-      <section className="pb-24">
-        <div className="container mx-auto px-6 max-w-4xl">
-          <div className="rounded-2xl bg-gradient-bamboo text-cream p-10 md:p-14 text-center shadow-elegant">
-            <h3 className="font-display text-2xl md:text-3xl mb-4">
+      {/* CTA Section */}
+      <section className="py-10 bg-gradient-bamboo text-cream">
+        <div className="container mx-auto px-6 max-w-5xl">
+          <div className="text-center space-y-6">
+            <div className="h-16 w-16 rounded-full bg-cream/20 backdrop-blur grid place-items-center mx-auto mb-4">
+              <MessageCircle className="h-8 w-8" />
+            </div>
+            <h3 className="font-display text-3xl md:text-4xl lg:text-5xl font-bold">
               Tertarik dengan pendekatan serupa?
             </h3>
-            <p className="text-cream/80 max-w-xl mx-auto mb-6">
-              Diskusikan kebutuhan proyek Anda — kami bantu merumuskan langkah pertamanya.
+            <p className="text-cream/90 text-lg max-w-2xl mx-auto leading-relaxed">
+              Diskusikan kebutuhan proyek Anda dengan tim kami. Kami siap membantu mewujudkan 
+              visi arsitektur dan interior impian Anda dengan pendekatan yang profesional dan personal.
             </p>
-            <a
-              href={waLink(`Halo RN_ARCHITECT, saya tertarik dengan proyek "${p.title}".`)}
-              target="_blank"
-              rel="noreferrer"
-              className="inline-flex items-center gap-2 px-7 py-3.5 rounded-full bg-cream text-bamboo-deep font-medium hover:bg-bamboo-soft transition-smooth"
-            >
-              <MessageCircle className="h-4 w-4" /> Mulai konsultasi
-            </a>
+            <div className="flex flex-col sm:flex-row gap-4 justify-center pt-4">
+              <a
+                href={waLink(`Halo RN_ARCHITECT, saya tertarik dengan proyek "${p.title}". Saya ingin konsultasi untuk proyek serupa.`)}
+                target="_blank"
+                rel="noreferrer"
+                className="inline-flex items-center justify-center gap-2 px-8 py-4 rounded-full bg-cream text-bamboo-deep font-semibold hover:bg-bamboo-soft transition-smooth shadow-xl"
+              >
+                <MessageCircle className="h-5 w-5" />
+                Mulai Konsultasi
+              </a>
+              <Link
+                href="/projects"
+                className="inline-flex items-center justify-center gap-2 px-8 py-4 rounded-full border-2 border-cream/30 text-cream font-semibold hover:bg-cream/10 transition-smooth"
+              >
+                Lihat Portfolio Lainnya
+              </Link>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Related Info */}
+      <section className="py-10 border-t border-border">
+        <div className="container mx-auto px-6 max-w-7xl">
+          <div className="grid md:grid-cols-3 gap-8">
+            <div className="text-center p-6">
+              <div className="h-14 w-14 rounded-full bg-primary/10 grid place-items-center mx-auto mb-4">
+                <Award className="h-7 w-7 text-primary" />
+              </div>
+              <h4 className="font-semibold mb-2">Kualitas Terjamin</h4>
+              <p className="text-sm text-muted-foreground">
+                Setiap proyek dikerjakan dengan standar kualitas tertinggi
+              </p>
+            </div>
+            <div className="text-center p-6">
+              <div className="h-14 w-14 rounded-full bg-primary/10 grid place-items-center mx-auto mb-4">
+                <User className="h-7 w-7 text-primary" />
+              </div>
+              <h4 className="font-semibold mb-2">Tim Profesional</h4>
+              <p className="text-sm text-muted-foreground">
+                Arsitek dan desainer berpengalaman siap membantu Anda
+              </p>
+            </div>
+            <div className="text-center p-6">
+              <div className="h-14 w-14 rounded-full bg-primary/10 grid place-items-center mx-auto mb-4">
+                <MessageCircle className="h-7 w-7 text-primary" />
+              </div>
+              <h4 className="font-semibold mb-2">Konsultasi Gratis</h4>
+              <p className="text-sm text-muted-foreground">
+                Diskusikan ide Anda tanpa biaya konsultasi awal
+              </p>
+            </div>
           </div>
         </div>
       </section>

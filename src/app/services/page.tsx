@@ -47,16 +47,16 @@ const services = [
 export default function ServicesPage() {
   return (
     <SiteLayout>
-      <section className="pt-40 pb-20 bg-gradient-warm">
-        <div className="container mx-auto px-6 max-w-4xl">
-          <p className="text-xs tracking-[0.3em] uppercase text-primary mb-4">Layanan</p>
-          <h1 className="text-5xl md:text-7xl text-balance leading-tight">
-            Dari ide pertama hingga <em className="text-primary not-italic">kunci diserahkan</em>.
-          </h1>
-        </div>
-      </section>
+      <section className="pt-32 md:pt-20 pb-10 bg-gradient-warm">
+  <div className="container mx-auto px-6 text-center">
+    <h1 className="text-5xl md:text-6xl text-balance leading-tight max-w-4xl mx-auto">
+      Dari ide pertama hingga{" "}
+      <em className="text-primary not-italic">kunci diserahkan</em>
+    </h1>
+  </div>
+</section>
 
-      <section className="py-20">
+      <section className="py-8">
         <div className="container mx-auto px-6 space-y-6">
           {services.map((s, i) => (
             <article

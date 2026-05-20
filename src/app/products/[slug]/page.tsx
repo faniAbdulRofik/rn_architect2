@@ -2,7 +2,17 @@
 
 import Link from "next/link";
 import { useEffect, useState } from "react";
-import { ArrowLeft, MessageCircle, Ruler, Layers, Tag, ShieldCheck } from "lucide-react";
+import { 
+  ArrowLeft, 
+  MessageCircle, 
+  Ruler, 
+  Layers, 
+  Tag, 
+  ShieldCheck,
+  Package,
+  Sparkles,
+  CheckCircle2
+} from "lucide-react";
 import { SiteLayout } from "@/components/site/SiteLayout";
 import { MediaCarousel, type MediaSlide } from "@/components/site/MediaCarousel";
 import { supabase } from "@/integrations/supabase/client";
@@ -24,23 +34,45 @@ type Product = {
   video_url: string | null;
 };
 
-export default function ProductDetail({ params }: { params: { slug: string } }) {
+export default function ProductDetail({ params }: { params: Promise<{ slug: string }> }) {
   const [p, setP] = useState<Product | null>(null);
   const [loading, setLoading] = useState(true);
   const [missing, setMissing] = useState(false);
 
   useEffect(() => {
-    supabase
-      .from("products")
-      .select("*")
-      .eq("slug", params.slug)
-      .maybeSingle()
-      .then(({ data }) => {
-        if (!data) setMissing(true);
-        else setP(data as unknown as Product);
+    const loadProduct = async () => {
+      try {
+        const resolvedParams = await params;
+        console.log("Loading product with slug:", resolvedParams.slug);
+        
+        const { data, error } = await supabase
+          .from("products")
+          .select("*")
+          .eq("slug", resolvedParams.slug)
+          .maybeSingle();
+
+        console.log("Product query result:", { data, error });
+
+        if (error) {
+          console.error("Error loading product:", error);
+          setMissing(true);
+        } else if (!data) {
+          console.log("No product found with slug:", resolvedParams.slug);
+          setMissing(true);
+        } else {
+          console.log("Product loaded successfully:", data);
+          setP(data as unknown as Product);
+        }
+      } catch (err) {
+        console.error("Exception loading product:", err);
+        setMissing(true);
+      } finally {
         setLoading(false);
-      });
-  }, [params.slug]);
+      }
+    };
+
+    loadProduct();
+  }, [params]);
 
   if (loading) {
     return (
@@ -51,12 +83,27 @@ export default function ProductDetail({ params }: { params: { slug: string } }) 
       </SiteLayout>
     );
   }
+  
   if (missing || !p) {
     return (
       <SiteLayout>
         <div className="pt-40 pb-32 container mx-auto px-6 text-center">
-          <h1 className="text-3xl mb-2">Produk tidak ditemukan</h1>
-          <Link href="/products" className="text-primary">Kembali ke katalog</Link>
+          <div className="max-w-md mx-auto">
+            <div className="h-20 w-20 rounded-full bg-muted grid place-items-center mx-auto mb-6">
+              <Package className="h-10 w-10 text-muted-foreground" />
+            </div>
+            <h1 className="text-3xl font-bold mb-3">Produk tidak ditemukan</h1>
+            <p className="text-muted-foreground mb-6">
+              Produk yang Anda cari tidak tersedia atau telah dihapus.
+            </p>
+            <Link 
+              href="/products" 
+              className="inline-flex items-center gap-2 px-6 py-3 rounded-full bg-primary text-primary-foreground hover:opacity-90 transition-smooth"
+            >
+              <ArrowLeft className="h-4 w-4" />
+              Kembali ke katalog
+            </Link>
+          </div>
         </div>
       </SiteLayout>
     );
@@ -69,97 +116,128 @@ export default function ProductDetail({ params }: { params: { slug: string } }) 
     ...p.images.map((src) => ({ kind: "image" as const, src, alt: p.title })),
   ];
 
+  const features = [
+    "Desain custom sesuai kebutuhan",
+    "Material berkualitas premium",
+    "Garansi kualitas produk",
+    "Konsultasi gratis dengan desainer",
+  ];
+
   return (
     <SiteLayout>
+      {/* Breadcrumb */}
       <section className="pt-28 md:pt-32 pb-6">
         <div className="container mx-auto px-6">
-          <Link
-            href="/products"
-            className="inline-flex items-center gap-1.5 text-xs uppercase tracking-widest text-muted-foreground hover:text-primary transition-smooth"
-          >
-            <ArrowLeft className="h-3.5 w-3.5" /> Kembali ke katalog
-          </Link>
-        </div>
-      </section>
-
-      <section className="pb-20">
-        <div className="container mx-auto px-6 grid lg:grid-cols-2 gap-10 lg:gap-16">
-          <MediaCarousel slides={slides} title={p.title} />
-
-          <div className="lg:pt-2">
-            <p className="text-xs tracking-[0.3em] uppercase text-primary mb-3">{p.category}</p>
-            <h1 className="text-3xl md:text-5xl text-balance leading-tight">{p.title}</h1>
-            {p.short_desc && (
-              <p className="mt-4 text-muted-foreground leading-relaxed">{p.short_desc}</p>
-            )}
-
-            {p.price_label && (
-              <div className="mt-6 inline-flex items-center gap-3 px-5 py-3 rounded-lg bg-primary/5 border border-primary/20">
-                <Tag className="h-4 w-4 text-primary" />
-                <span className="font-display text-2xl text-primary">{p.price_label}</span>
-              </div>
-            )}
-
-            <div className="mt-8 grid sm:grid-cols-2 gap-3">
-              {p.material && <InfoRow icon={Layers} label="Material" value={p.material} />}
-              {p.dimensions && <InfoRow icon={Ruler} label="Dimensi" value={p.dimensions} />}
-              <InfoRow icon={ShieldCheck} label="Custom" value="Tersedia sesuai kebutuhan" />
-            </div>
-
-            <div className="mt-8 flex flex-wrap gap-3">
-              <a
-                href={waLink(`Halo RN_ARCHITECT, saya tertarik dengan produk: ${p.title}`)}
-                target="_blank"
-                rel="noreferrer"
-                className="inline-flex items-center gap-2 px-6 py-3.5 rounded-full bg-primary text-primary-foreground hover:opacity-90 transition-smooth"
-              >
-                <MessageCircle className="h-4 w-4" /> Pesan via WhatsApp
-              </a>
-              <Link
-                href="/contact"
-                className="inline-flex items-center gap-2 px-6 py-3.5 rounded-full border border-border hover:bg-secondary transition-smooth"
-              >
-                Tanya detail
-              </Link>
-            </div>
+          <div className="flex items-center gap-2 text-sm text-muted-foreground">
+            <Link href="/" className="hover:text-primary transition-smooth">Home</Link>
+            <span>/</span>
+            <Link href="/products" className="hover:text-primary transition-smooth">Produk</Link>
+            <span>/</span>
+            <span className="text-foreground">{p.title}</span>
           </div>
         </div>
       </section>
 
-      {(p.description || p.specs.length > 0) && (
-        <section className="py-16 bg-secondary/40 border-t border-border">
-          <div className="container mx-auto px-6 grid md:grid-cols-3 gap-12">
-            {p.description && (
-              <div className="md:col-span-2">
-                <h2 className="text-2xl mb-4">Deskripsi</h2>
-                <p className="text-muted-foreground leading-relaxed whitespace-pre-line">
-                  {p.description}
-                </p>
+      {/* Product Detail */}
+      <section className="pb-16">
+        <div className="container mx-auto px-6">
+          <div className="grid lg:grid-cols-2 gap-8 lg:gap-16 max-w-7xl mx-auto">
+            {/* Gallery */}
+            <div className="lg:sticky lg:top-28 lg:self-start">
+              <MediaCarousel slides={slides} title={p.title} />
+            </div>
+
+            {/* Product Info */}
+            <div className="space-y-6">
+              {/* Category Badge */}
+              <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 border border-primary/20">
+                <Sparkles className="h-3.5 w-3.5 text-primary" />
+                <span className="text-xs font-medium tracking-wider uppercase text-primary">
+                  {p.category}
+                </span>
               </div>
-            )}
-            {p.specs.length > 0 && (
+
+              {/* Title */}
               <div>
-                <h2 className="text-2xl mb-4">Spesifikasi</h2>
-                <dl className="divide-y divide-border rounded-lg bg-card border border-border overflow-hidden">
-                  {p.specs.map((s) => (
-                    <div key={s.label} className="flex items-start justify-between gap-4 px-4 py-3">
-                      <dt className="text-xs uppercase tracking-widest text-muted-foreground">
-                        {s.label}
-                      </dt>
-                      <dd className="text-sm text-right">{s.value}</dd>
-                    </div>
-                  ))}
-                </dl>
+                <h1 className="text-3xl md:text-5xl font-bold text-balance leading-tight mb-3">
+                  {p.title}
+                </h1>
+                {p.short_desc && (
+                  <p className="text-lg text-muted-foreground leading-relaxed">
+                    {p.short_desc}
+                  </p>
+                )}
               </div>
-            )}
+
+              
+
+              {/* Quick Info */}
+              <div className="grid sm:grid-cols-2 gap-3">
+                {p.material && (
+                  <InfoCard icon={Layers} label="Material" value={p.material} />
+                )}
+                {p.dimensions && (
+                  <InfoCard icon={Ruler} label="Dimensi" value={p.dimensions} />
+                )}
+                <InfoCard 
+                  icon={ShieldCheck} 
+                  label="Kustomisasi" 
+                  value="Tersedia" 
+                />
+                <InfoCard 
+                  icon={Package} 
+                  label="Pengiriman" 
+                  value="Seluruh Indonesia" 
+                />
+              </div>
+
+              {/* Features */}
+              <div className="bg-secondary/40 rounded-xl p-6 space-y-3">
+                <h3 className="font-semibold text-sm uppercase tracking-wider mb-4">
+                  Keunggulan Produk
+                </h3>
+                {features.map((feature, idx) => (
+                  <div key={idx} className="flex items-start gap-3">
+                    <CheckCircle2 className="h-5 w-5 text-primary shrink-0 mt-0.5" />
+                    <span className="text-sm text-muted-foreground">{feature}</span>
+                  </div>
+                ))}
+              </div>
+
+              {/* CTA Buttons */}
+              <div className="flex flex-col sm:flex-row gap-3 pt-4">
+                <a
+                  href={waLink(`Halo RN_ARCHITECT, saya tertarik dengan produk: ${p.title}`)}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="flex-1 inline-flex items-center justify-center gap-2 px-6 py-4 rounded-xl bg-primary text-primary-foreground font-medium hover:opacity-90 transition-smooth shadow-lg shadow-primary/20"
+                >
+                  <MessageCircle className="h-5 w-5" />
+                  Pesan via WhatsApp
+                </a>
+                <Link
+                  href="/contact"
+                  className="inline-flex items-center justify-center gap-2 px-6 py-4 rounded-xl border-2 border-border hover:bg-secondary transition-smooth font-medium"
+                >
+                  Konsultasi Gratis
+                </Link>
+              </div>
+
+              {/* Trust Badge */}
+              <div className="flex items-center gap-3 text-sm text-muted-foreground pt-4">
+                <ShieldCheck className="h-5 w-5 text-primary" />
+                <span>Garansi kepuasan pelanggan • Konsultasi gratis • Pengerjaan profesional</span>
+              </div>
+            </div>
           </div>
-        </section>
-      )}
+        </div>
+      </section>
+      
     </SiteLayout>
   );
 }
 
-function InfoRow({
+function InfoCard({
   icon: Icon,
   label,
   value,
@@ -169,11 +247,15 @@ function InfoRow({
   value: string;
 }) {
   return (
-    <div className="flex items-start gap-3 p-4 rounded-lg border border-border bg-card">
-      <Icon className="h-4 w-4 text-primary mt-0.5" />
-      <div>
-        <div className="text-[10px] uppercase tracking-widest text-muted-foreground">{label}</div>
-        <div className="text-sm">{value}</div>
+    <div className="flex items-start gap-3 p-4 rounded-lg border border-border bg-card hover:border-primary/30 transition-smooth">
+      <div className="h-10 w-10 rounded-lg bg-primary/10 grid place-items-center shrink-0">
+        <Icon className="h-5 w-5 text-primary" />
+      </div>
+      <div className="min-w-0">
+        <div className="text-[10px] uppercase tracking-widest text-muted-foreground mb-1">
+          {label}
+        </div>
+        <div className="text-sm font-medium">{value}</div>
       </div>
     </div>
   );

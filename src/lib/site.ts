@@ -1,9 +1,7 @@
 export const SITE = {
   name: "RN_ARCHITECT",
-  tagline: "Arsitektur & Interior yang Berbicara",
-  whatsapp: "6281234567890",
-  email: "hello@rn-architect.com",
-  address: "Jakarta, Indonesia",
+  whatsapp: "62895618133733",
+  address: "Lampung, Indonesia",
   hours: "Senin – Sabtu, 09.00 – 18.00 WIB",
   // Reliable Pexels CDN sample (modern architecture). Replace anytime.
   heroVideo:

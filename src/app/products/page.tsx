@@ -13,7 +13,6 @@ type Product = {
   title: string;
   category: string;
   material: string | null;
-  price_label: string | null;
   images: string[];
   is_featured: boolean;
 };
@@ -50,19 +49,21 @@ export default function ProductsPage() {
 
   return (
     <SiteLayout>
-      <section className="pt-32 md:pt-36 pb-10 bg-gradient-warm">
-        <div className="container mx-auto px-6 max-w-4xl">
-          <p className="text-xs tracking-[0.3em] uppercase text-primary mb-3">Katalog</p>
-          <h1 className="text-4xl md:text-6xl text-balance leading-tight">Produk interior custom</h1>
-          <p className="mt-5 text-muted-foreground max-w-xl">
-            Setiap produk dapat dipesan custom sesuai dimensi, material, dan finishing.
-          </p>
-        </div>
-      </section>
+      <section className="pt-32 md:pt-20 pb-10 bg-gradient-warm">
+  <div className="container mx-auto px-6 max-w-4xl text-center">
+    <h1 className="text-4xl md:text-6xl text-balance leading-tight">
+      Produk interior custom
+    </h1>
+
+    <p className="text-muted-foreground max-w-xl mx-auto">
+      Setiap produk dapat dipesan custom sesuai dimensi, material, dan finishing.
+    </p>
+  </div>
+</section>
 
       {/* COMPACT STICKY FILTER */}
       <div className="sticky top-14 md:top-16 z-30 bg-background/90 backdrop-blur border-b border-border/70">
-        <div className="container mx-auto px-6 py-2.5 flex flex-wrap gap-2 items-center justify-between">
+        <div className="container mx-auto px-6 py-4 flex flex-wrap gap- items-center justify-between">
           <div className="flex flex-wrap gap-1.5 -mx-1 overflow-x-auto no-scrollbar">
             {categories.map((c) => (
               <button
@@ -90,7 +91,7 @@ export default function ProductsPage() {
         </div>
       </div>
 
-      <section className="py-12 md:py-16">
+      <section className="py-12 md:py-8">
         <div className="container mx-auto px-6">
           {loading ? (
             <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -125,9 +126,6 @@ export default function ProductsPage() {
                       </div>
                       <ArrowUpRight className="h-4 w-4 text-muted-foreground group-hover:text-primary transition-smooth" />
                     </div>
-                    {p.price_label && (
-                      <p className="mt-3 text-sm font-medium text-primary">{p.price_label}</p>
-                    )}
                   </div>
                 </Link>
               ))}

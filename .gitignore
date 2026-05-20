@@ -33,6 +33,9 @@ yarn-error.log*
 .env*
 !.env.example
 
+*.md
+*.sql
+
 # vercel
 .vercel
 
