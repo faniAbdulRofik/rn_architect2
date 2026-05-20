@@ -62,7 +62,7 @@ export default function ProductsPage() {
 </section>
 
       {/* COMPACT STICKY FILTER */}
-      <div className="sticky top-14 md:top-16 z-30 bg-background/90 backdrop-blur border-b border-border/70">
+      <div className="border-b border-border/70">
         <div className="container mx-auto px-6 py-4 flex flex-wrap gap- items-center justify-between">
           <div className="flex flex-wrap gap-1.5 -mx-1 overflow-x-auto no-scrollbar">
             {categories.map((c) => (
@@ -133,7 +133,7 @@ export default function ProductsPage() {
           )}
           {!loading && filtered.length === 0 && (
             <p className="text-center text-muted-foreground py-20">
-              Tidak ada produk yang cocok dengan pencarian.
+              Tidak ada produk yang tersedia saat ini
             </p>
           )}
         </div>

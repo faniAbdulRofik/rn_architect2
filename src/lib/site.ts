@@ -1,6 +1,6 @@
 export const SITE = {
   name: "RN_ARCHITECT",
-  whatsapp: "62895618133733",
+  whatsapp: "6282282309837",
   address: "Lampung, Indonesia",
   hours: "Senin – Sabtu, 09.00 – 18.00 WIB",
   // Reliable Pexels CDN sample (modern architecture). Replace anytime.

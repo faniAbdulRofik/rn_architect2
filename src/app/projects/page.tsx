@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
-import { ArrowUpRight } from "lucide-react";
+import { ArrowUpRight, Search } from "lucide-react";
 import { SiteLayout } from "@/components/site/SiteLayout";
 import { supabase } from "@/integrations/supabase/client";
 import { resolveAsset } from "@/lib/assets";
@@ -23,6 +23,7 @@ export default function ProjectsPage() {
   const [items, setItems] = useState<Project[]>([]);
   const [loading, setLoading] = useState(true);
   const [c, setC] = useState("Semua");
+  const [q, setQ] = useState("");
 
   useEffect(() => {
     supabase
@@ -41,7 +42,13 @@ export default function ProjectsPage() {
     () => ["Semua", ...Array.from(new Set(items.map((p) => p.category)))],
     [items]
   );
-  const list = c === "Semua" ? items : items.filter((p) => p.category === c);
+  
+  // Menggabungkan filter kategori dan pencarian nama proyek
+  const filtered = items.filter((p) => {
+    const matchCat = c === "Semua" || p.category === c;
+    const matchQ = q === "" || p.title.toLowerCase().includes(q.toLowerCase());
+    return matchCat && matchQ;
+  });
 
   return (
     <SiteLayout>
@@ -53,20 +60,34 @@ export default function ProjectsPage() {
         </div>
       </section>
 
-      <div className="sticky top-14 md:top-16 z-30 bg-background/90 backdrop-blur border-b border-border/70">
-        <div className="container mx-auto px-6 py-4 flex flex-wrap gap-3">
-          {cats.map((cat) => (
-            <button
-              key={cat}
-              onClick={() => setC(cat)}
-              className={`px-3 py-1.5 rounded-full text-xs font-medium transition-smooth whitespace-nowrap ${c === cat
-                  ? "bg-primary text-primary-foreground"
-                  : "bg-secondary/70 hover:bg-secondary text-foreground/80"
+{/* sticky top-14 md:top-16 z-30 bg-background/90 backdrop-blur border-b border-border/70 */}
+      <div className="border-b border-border/70">
+        <div className="container mx-auto px-6 py-4 flex flex-wrap gap-4 items-center justify-between">
+          <div className="flex flex-wrap gap-1.5 overflow-x-auto no-scrollbar">
+            {cats.map((cat) => (
+              <button
+                key={cat}
+                onClick={() => setC(cat)}
+                className={`px-3 py-1.5 rounded-full text-xs font-medium transition-smooth whitespace-nowrap ${
+                  c === cat
+                    ? "bg-primary text-primary-foreground"
+                    : "bg-secondary/70 hover:bg-secondary text-foreground/80"
                 }`}
-            >
-              {cat}
-            </button>
-          ))}
+              >
+                {cat}
+              </button>
+            ))}
+          </div>
+          
+          <div className="relative w-full sm:w-60">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-muted-foreground" />
+            <input
+              value={q}
+              onChange={(e) => setQ(e.target.value)}
+              placeholder="Cari proyek…"
+              className="w-full pl-8 pr-3 py-1.5 rounded-full border border-input bg-background text-xs focus:outline-none focus:ring-2 focus:ring-ring/50"
+            />
+          </div>
         </div>
       </div>
 
@@ -78,9 +99,10 @@ export default function ProjectsPage() {
                 <div key={i} className="aspect-square bg-muted animate-pulse rounded-lg" />
               ))}
             </div>
-          ) : (
+          ) : filtered.length > 0 ? (
+            /* Menampilkan daftar proyek jika ada data yang cocok dengan filter/pencarian */
             <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
-              {list.map((p) => (
+              {filtered.map((p) => (
                 <Link
                   key={p.id}
                   href={`/projects/${p.slug}`}
@@ -114,6 +136,13 @@ export default function ProjectsPage() {
                   </div>
                 </Link>
               ))}
+            </div>
+          ) : (
+            /* Menampilkan pesan kosong jika tidak ada data dari hasil filter/pencarian */
+            <div className="py-20 flex flex-col items-center justify-center">
+              <p className="text-center text-muted-foreground text-lg">
+                Tidak ada proyek yang tersedia saat ini
+              </p>
             </div>
           )}
         </div>
