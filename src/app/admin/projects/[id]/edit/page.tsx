@@ -195,7 +195,7 @@ export default function EditProjectPage() {
             </div>
           </div>
 
-          <div className="grid md:grid-cols-2 gap-4">
+          <div className="grid md:grid-cols-3 gap-4">
             <div>
               <label className="block text-sm font-medium mb-2">Kategori</label>
               <select
@@ -216,6 +216,19 @@ export default function EditProjectPage() {
                 type="text"
                 value={formData.location}
                 onChange={(e) => setFormData({ ...formData, location: e.target.value })}
+                className="w-full px-3 py-2 rounded-lg border border-input bg-background focus:outline-none focus:ring-2 focus:ring-ring"
+              />
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium mb-2">Tahun</label>
+              <input
+                type="number"
+                min="1900"
+                max={new Date().getFullYear() + 1}
+                value={formData.year}
+                onChange={(e) => setFormData({ ...formData, year: Number(e.target.value) || new Date().getFullYear() })}
+                placeholder="Contoh: 2022"
                 className="w-full px-3 py-2 rounded-lg border border-input bg-background focus:outline-none focus:ring-2 focus:ring-ring"
               />
             </div>

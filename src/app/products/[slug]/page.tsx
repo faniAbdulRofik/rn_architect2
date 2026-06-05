@@ -7,7 +7,6 @@ import {
   MessageCircle, 
   Ruler, 
   Layers, 
-  Tag, 
   ShieldCheck,
   Package,
   Sparkles,
@@ -115,6 +114,7 @@ export default function ProductDetail({ params }: { params: Promise<{ slug: stri
       : []),
     ...p.images.map((src) => ({ kind: "image" as const, src, alt: p.title })),
   ];
+  const productDescription = p.description || p.short_desc;
 
   const features = [
     "Desain custom sesuai kebutuhan",
@@ -126,8 +126,8 @@ export default function ProductDetail({ params }: { params: Promise<{ slug: stri
   return (
     <SiteLayout>
       {/* Breadcrumb */}
-      <section className="pt-28 md:pt-32 pb-6">
-        <div className="container mx-auto px-6">
+      <section className="pt-28 md:pt-20 pb-6">
+        <div className="container mx-auto px-6 max-w-[96rem]">
           <div className="flex items-center gap-2 text-sm text-muted-foreground">
             <Link href="/" className="hover:text-primary transition-smooth">Home</Link>
             <span>/</span>
@@ -140,8 +140,8 @@ export default function ProductDetail({ params }: { params: Promise<{ slug: stri
 
       {/* Product Detail */}
       <section className="pb-16">
-        <div className="container mx-auto px-6">
-          <div className="grid lg:grid-cols-2 gap-8 lg:gap-16 max-w-7xl mx-auto">
+        <div className="container mx-auto px-6 max-w-[96rem]">
+          <div className="grid lg:grid-cols-[minmax(0,1.05fr)_minmax(0,1fr)] gap-8 lg:gap-12 xl:gap-16">
             {/* Gallery */}
             <div className="lg:sticky lg:top-28 lg:self-start">
               <MediaCarousel slides={slides} title={p.title} />
@@ -162,9 +162,9 @@ export default function ProductDetail({ params }: { params: Promise<{ slug: stri
                 <h1 className="text-3xl md:text-5xl font-bold text-balance leading-tight mb-3">
                   {p.title}
                 </h1>
-                {p.short_desc && (
-                  <p className="text-lg text-muted-foreground leading-relaxed">
-                    {p.short_desc}
+                {productDescription && (
+                  <p className="text-lg text-muted-foreground leading-relaxed text-justify">
+                    {productDescription}
                   </p>
                 )}
               </div>
@@ -247,7 +247,7 @@ function InfoCard({
   value: string;
 }) {
   return (
-    <div className="flex items-start gap-3 p-4 rounded-lg border border-border bg-card hover:border-primary/30 transition-smooth">
+    <div className="flex min-h-[92px] items-center gap-4 p-4 rounded-lg border border-border bg-card hover:border-primary/30 transition-smooth">
       <div className="h-10 w-10 rounded-lg bg-primary/10 grid place-items-center shrink-0">
         <Icon className="h-5 w-5 text-primary" />
       </div>
@@ -255,7 +255,7 @@ function InfoCard({
         <div className="text-[10px] uppercase tracking-widest text-muted-foreground mb-1">
           {label}
         </div>
-        <div className="text-sm font-medium">{value}</div>
+        <div className="text-sm font-medium leading-snug">{value}</div>
       </div>
     </div>
   );

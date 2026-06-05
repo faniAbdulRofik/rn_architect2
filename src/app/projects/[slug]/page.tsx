@@ -8,7 +8,6 @@ import {
   Clock, 
   MapPin, 
   User, 
-  Layers, 
   Lightbulb, 
   MessageCircle,
   Building2,
@@ -118,6 +117,7 @@ export default function ProjectDetail({ params }: { params: Promise<{ slug: stri
       : []),
     ...p.images.map((src) => ({ kind: "image" as const, src, alt: p.title })),
   ];
+  const projectDescription = p.description || p.short_desc;
 
   const facts = [
     { icon: MapPin, label: "Lokasi", value: p.location },
@@ -130,8 +130,8 @@ export default function ProjectDetail({ params }: { params: Promise<{ slug: stri
   return (
     <SiteLayout>
       {/* Breadcrumb */}
-      <section className="pt-28 md:pt-32 pb-6">
-        <div className="container mx-auto px-6 max-w-7xl">
+      <section className="pt-28 md:pt-20 pb-6">
+        <div className="container mx-auto px-7 max-w-[96rem]">
           <div className="flex items-center gap-2 text-sm text-muted-foreground">
             <Link href="/" className="hover:text-primary transition-smooth">Home</Link>
             <span>/</span>
@@ -143,52 +143,59 @@ export default function ProjectDetail({ params }: { params: Promise<{ slug: stri
       </section>
 
       {/* Hero header */}
-      <section className="pb-12">
-        <div className="container mx-auto px-6 max-w-7xl">
-          <div className="max-w-4xl">
-            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 border border-primary/20 mb-6">
-              <Award className="h-3.5 w-3.5 text-primary" />
-              <span className="text-xs font-medium tracking-wider uppercase text-primary">
-                {p.category}
-              </span>
-            </div>
-            <h1 className="text-4xl md:text-6xl lg:text-7xl font-bold text-balance leading-tight mb-6">
-              {p.title}
-            </h1>
-            {p.short_desc && (
-              <p className="text-lg md:text-xl text-muted-foreground leading-relaxed">
-                {p.short_desc}
-              </p>
-            )}
+      <section className="pb-8">
+        <div className="container mx-auto px-6 max-w-[96rem]">
+          <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 border border-primary/20 mb-4">
+            <Award className="h-3.5 w-3.5 text-primary" />
+            <span className="text-xs font-medium tracking-wider uppercase text-primary">
+              {p.category}
+            </span>
           </div>
+          <h1 className="text-3xl md:text-5xl font-bold leading-tight">
+            {p.title}
+          </h1>
         </div>
       </section>
 
       {/* Gallery */}
-      <section className="pb-16">
-        <div className="container mx-auto px-6 max-w-7xl">
-          <MediaCarousel slides={slides} title={p.title} />
+      <section className="pb-8">
+        <div className="container mx-auto px-6 max-w-[96rem]">
+          <MediaCarousel
+            slides={slides}
+            title={p.title}
+            frameClassName="h-[320px] sm:h-[420px] lg:h-[500px] xl:h-[560px]"
+          />
         </div>
       </section>
 
+      {projectDescription && (
+        <section className="pb-12">
+          <div className="container mx-auto px-6 max-w-[96rem]">
+            <p className="text-lg md:text-2xl text-muted-foreground leading-relaxed text-justify">
+              {projectDescription}
+            </p>
+          </div>
+        </section>
+      )}
+
       {/* Project Facts */}
       {facts.length > 0 && (
-        <section className="py-10 bg-secondary/30 border-y border-border">
-          <div className="container mx-auto px-6 max-w-7xl">
+        <section className="py-6 bg-secondary/30 border-y border-border">
+          <div className="container mx-auto px-6 max-w-[96rem]">
             <h2 className="text-sm uppercase tracking-widest text-muted-foreground mb-8">
               Detail Proyek
             </h2>
-            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-20">
+            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-8 lg:gap-20">
               {facts.map((f) => (
-                <div key={f.label} className="space-y-3">
+                <div key={f.label} className="flex flex-col items-center text-center">
                   <div className="h-12 w-12 rounded-xl bg-primary/10 grid place-items-center">
                     <f.icon className="h-6 w-6 text-primary" />
                   </div>
-                  <div>
+                  <div className="mt-4 w-full max-w-[14rem]">
                     <div className="text-[10px] uppercase tracking-widest text-muted-foreground mb-1.5">
                       {f.label}
                     </div>
-                    <div className="text-sm font-medium leading-snug">{f.value}</div>
+                    <div className="text-sm font-medium leading-snug text-balance">{f.value}</div>
                   </div>
                 </div>
               ))}
@@ -234,7 +241,7 @@ export default function ProjectDetail({ params }: { params: Promise<{ slug: stri
 
       {/* Related Info */}
       <section className="py-10 border-t border-border">
-        <div className="container mx-auto px-6 max-w-7xl">
+        <div className="container mx-auto px-6 max-w-[96rem]">
           <div className="grid md:grid-cols-3 gap-8">
             <div className="text-center p-6">
               <div className="h-14 w-14 rounded-full bg-primary/10 grid place-items-center mx-auto mb-4">

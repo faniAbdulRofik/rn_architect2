@@ -15,6 +15,19 @@ const map: Record<string, StaticImageData> = {
   "project-2.jpg": project2,
 };
 
+function resolveBundledAsset(src: string): StaticImageData | undefined {
+  const normalizedPath = src.replaceAll("\\", "/");
+  const fileName = normalizedPath.split("/").pop() ?? normalizedPath;
+  const exactMatch = map[fileName];
+  if (exactMatch) return exactMatch;
+
+  const fileNameWithoutHash = fileName.replace(/(\.[a-z0-9]+)?(\.[a-z]+)$/i, "$2");
+  return Object.entries(map).find(([key]) => {
+    const baseName = key.replace(/\.[a-z]+$/i, "");
+    return fileName.startsWith(`${baseName}.`) || fileNameWithoutHash === key;
+  })?.[1];
+}
+
 function getGoogleDriveFileId(url: URL): string | null {
   if (!/(^|\.)drive\.google\.com$/i.test(url.hostname)) return null;
 
@@ -52,7 +65,11 @@ export function resolveAsset(src: string | null | undefined): string {
   if (!src) return hero.src;
 
   const normalized = normalizeImageUrl(src);
+  const bundledAsset = resolveBundledAsset(normalized);
+  if (bundledAsset) return bundledAsset.src;
+
   if (/^https?:\/\//i.test(normalized)) return normalized;
+  if (normalized.startsWith("/")) return normalized;
 
   const key = normalized.split("/").pop() ?? normalized;
   return map[key]?.src ?? hero.src;
