@@ -1,11 +1,12 @@
 "use client";
 
 import { useRouter, useParams } from "next/navigation";
-import { useState, useEffect } from "react";
+import { useCallback, useState, useEffect } from "react";
 import { ArrowLeft, Plus, X } from "lucide-react";
 import Link from "next/link";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
+import { normalizeImageUrl } from "@/lib/assets";
 
 export default function EditProductPage() {
   const router = useRouter();
@@ -27,11 +28,7 @@ export default function EditProductPage() {
   });
   const [images, setImages] = useState<string[]>([""]);
 
-  useEffect(() => {
-    loadProduct();
-  }, [productId]);
-
-  const loadProduct = async () => {
+  const loadProduct = useCallback(async () => {
     try {
       const { data, error } = await supabase
         .from("products")
@@ -62,7 +59,12 @@ export default function EditProductPage() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [productId, router]);
+
+  useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    loadProduct();
+  }, [loadProduct]);
 
   const generateSlug = (title: string) => {
     return title
@@ -104,7 +106,9 @@ export default function EditProductPage() {
         return;
       }
 
-      const validImages = images.filter((img) => img.trim() !== "");
+      const validImages = images
+        .map(normalizeImageUrl)
+        .filter((img) => img !== "");
 
       const { error } = await supabase
         .from("products")
@@ -119,9 +123,9 @@ export default function EditProductPage() {
 
       toast.success("Produk berhasil diupdate");
       router.push("/admin/products");
-    } catch (error: any) {
+    } catch (error) {
       console.error("Error updating product:", error);
-      toast.error(error.message || "Gagal mengupdate produk");
+      toast.error(error instanceof Error ? error.message : "Gagal mengupdate produk");
     } finally {
       setSaving(false);
     }

@@ -1,11 +1,12 @@
 "use client";
 
 import { useRouter, useParams } from "next/navigation";
-import { useState, useEffect } from "react";
+import { useCallback, useState, useEffect } from "react";
 import { ArrowLeft, Plus, X } from "lucide-react";
 import Link from "next/link";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
+import { normalizeImageUrl } from "@/lib/assets";
 
 export default function EditProjectPage() {
   const router = useRouter();
@@ -31,11 +32,7 @@ export default function EditProjectPage() {
   });
   const [images, setImages] = useState<string[]>([""]);
 
-  useEffect(() => {
-    loadProject();
-  }, [projectId]);
-
-  const loadProject = async () => {
+  const loadProject = useCallback(async () => {
     try {
       const { data, error } = await supabase
         .from("projects")
@@ -70,7 +67,12 @@ export default function EditProjectPage() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [projectId, router]);
+
+  useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    loadProject();
+  }, [loadProject]);
 
   const generateSlug = (title: string) => {
     return title
@@ -112,12 +114,15 @@ export default function EditProjectPage() {
         return;
       }
 
-      const validImages = images.filter((img) => img.trim() !== "");
+      const validImages = images
+        .map(normalizeImageUrl)
+        .filter((img) => img !== "");
 
       const { error } = await supabase
         .from("projects")
         .update({
           ...formData,
+          cover_image: normalizeImageUrl(formData.cover_image),
           images: validImages,
           updated_at: new Date().toISOString(),
         })
@@ -127,9 +132,9 @@ export default function EditProjectPage() {
 
       toast.success("Proyek berhasil diupdate");
       router.push("/admin/projects");
-    } catch (error: any) {
+    } catch (error) {
       console.error("Error updating project:", error);
-      toast.error(error.message || "Gagal mengupdate proyek");
+      toast.error(error instanceof Error ? error.message : "Gagal mengupdate proyek");
     } finally {
       setSaving(false);
     }

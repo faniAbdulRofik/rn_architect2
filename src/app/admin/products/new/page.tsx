@@ -6,6 +6,7 @@ import { ArrowLeft, Plus, X } from "lucide-react";
 import Link from "next/link";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
+import { normalizeImageUrl } from "@/lib/assets";
 
 export default function NewProductPage() {
   const router = useRouter();
@@ -63,7 +64,9 @@ export default function NewProductPage() {
         return;
       }
 
-      const validImages = images.filter((img) => img.trim() !== "");
+      const validImages = images
+        .map(normalizeImageUrl)
+        .filter((img) => img !== "");
 
       const { error } = await supabase.from("products").insert({
         ...formData,
@@ -74,9 +77,9 @@ export default function NewProductPage() {
 
       toast.success("Produk berhasil ditambahkan");
       router.push("/admin/products");
-    } catch (error: any) {
+    } catch (error) {
       console.error("Error creating product:", error);
-      toast.error(error.message || "Gagal menambahkan produk");
+      toast.error(error instanceof Error ? error.message : "Gagal menambahkan produk");
     } finally {
       setLoading(false);
     }

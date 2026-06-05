@@ -6,6 +6,10 @@ import { supabase } from "@/integrations/supabase/client";
 import { resolveAsset } from "@/lib/assets";
 import hero from "@/assets/hero-architecture.jpg";
 
+export const dynamic = "force-dynamic";
+export const fetchCache = "force-no-store";
+export const revalidate = 0;
+
 const services = [
   { icon: Compass, title: "Desain Arsitektur", desc: "Perancangan rumah, vila, dan ruang komersial dengan pendekatan kontekstual." },
   { icon: HomeIcon, title: "Interior Design", desc: "Konsep interior menyeluruh — dari layout, material, hingga styling." },
@@ -260,7 +264,7 @@ export default async function HomePage() {
               <figure key={t.name} className="border-l-2 border-bamboo-soft pl-6">
                 <Sparkles className="h-5 w-5 text-bamboo-soft mb-4" />
                 <blockquote className="font-display text-xl leading-snug text-cream/95">
-                  "{t.quote}"
+                  &ldquo;{t.quote}&rdquo;
                 </blockquote>
                 <figcaption className="mt-5 text-sm text-cream/70">
                   <span className="text-cream">{t.name}</span> — {t.role}

@@ -15,15 +15,46 @@ const map: Record<string, StaticImageData> = {
   "project-2.jpg": project2,
 };
 
+function getGoogleDriveFileId(url: URL): string | null {
+  if (!/(^|\.)drive\.google\.com$/i.test(url.hostname)) return null;
+
+  const filePathMatch = url.pathname.match(/\/file\/d\/([^/]+)/);
+  if (filePathMatch?.[1]) return filePathMatch[1];
+
+  return url.searchParams.get("id");
+}
+
+export function normalizeImageUrl(src: string): string {
+  const trimmed = src.trim();
+  if (!/^https?:\/\//i.test(trimmed)) return trimmed;
+
+  try {
+    const url = new URL(trimmed);
+    const driveFileId = getGoogleDriveFileId(url);
+
+    if (driveFileId) {
+      return `https://drive.google.com/thumbnail?id=${encodeURIComponent(driveFileId)}&sz=w1200`;
+    }
+  } catch {
+    return trimmed;
+  }
+
+  return trimmed;
+}
+
 /**
  * Resolve image strings stored in DB:
- * - external URL (http/https) → return as-is
- * - "/src/assets/<name>" or "<name>" → bundled asset import
+ * - Google Drive share URL -> direct image thumbnail URL
+ * - external URL (http/https) -> return normalized URL
+ * - "/src/assets/<name>" or "<name>" -> bundled asset import
  */
 export function resolveAsset(src: string | null | undefined): string {
   if (!src) return hero.src;
-  if (/^https?:\/\//i.test(src)) return src;
-  const key = src.split("/").pop() ?? src;
+
+  const normalized = normalizeImageUrl(src);
+  if (/^https?:\/\//i.test(normalized)) return normalized;
+
+  const key = normalized.split("/").pop() ?? normalized;
   return map[key]?.src ?? hero.src;
 }
 

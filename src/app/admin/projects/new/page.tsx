@@ -6,6 +6,7 @@ import { ArrowLeft, Plus, X } from "lucide-react";
 import Link from "next/link";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
+import { normalizeImageUrl } from "@/lib/assets";
 
 export default function NewProjectPage() {
   const router = useRouter();
@@ -67,10 +68,13 @@ export default function NewProjectPage() {
         return;
       }
 
-      const validImages = images.filter((img) => img.trim() !== "");
+      const validImages = images
+        .map(normalizeImageUrl)
+        .filter((img) => img !== "");
 
       const { error } = await supabase.from("projects").insert({
         ...formData,
+        cover_image: normalizeImageUrl(formData.cover_image),
         images: validImages,
       });
 
@@ -78,9 +82,9 @@ export default function NewProjectPage() {
 
       toast.success("Proyek berhasil ditambahkan");
       router.push("/admin/projects");
-    } catch (error: any) {
+    } catch (error) {
       console.error("Error creating project:", error);
-      toast.error(error.message || "Gagal menambahkan proyek");
+      toast.error(error instanceof Error ? error.message : "Gagal menambahkan proyek");
     } finally {
       setLoading(false);
     }
