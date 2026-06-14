@@ -1,12 +1,12 @@
 import Link from "next/link";
-import { Instagram, Mail, MapPin, Phone, } from "lucide-react";
+import { Instagram, MapPin, Phone } from "lucide-react";
 import { SITE, waLink } from "@/lib/site";
 import { FaTiktok } from "react-icons/fa";
 
 export function Footer() {
   return (
-    <footer className="bg-bamboo-deep text-cream">
-      <div className="container mx-auto px-6 py-16 grid gap-12 md:grid-cols-4">
+    <footer className="shrink-0 bg-bamboo-deep text-cream">
+      <div className="container mx-auto grid gap-8 px-6 py-10 md:grid-cols-4 md:gap-12 md:py-16">
         <div className="md:col-span-2 space-y-4">
           <Link href="/" className="flex items-center gap-2 group">
             {/* Bagian Logo (Gambar) */}
@@ -86,7 +86,7 @@ export function Footer() {
         </div>
       </div>
       <div className="border-t border-cream/10">
-        <div className="container mx-auto px-6 py-6 text-xs text-cream/60 flex flex-wrap gap-2 justify-between">
+        <div className="container mx-auto flex flex-col gap-2 px-6 py-6 pb-[calc(1.5rem+env(safe-area-inset-bottom))] text-xs text-cream/60 sm:flex-row sm:flex-wrap sm:justify-between">
           <span>© {new Date().getFullYear()} RN_ARCHITECT. All rights reserved.</span>
           <span>{SITE.hours}</span>
         </div>

@@ -72,18 +72,18 @@ export default async function HomePage() {
         <div className="absolute inset-0 bg-gradient-hero" />
         <div className="absolute inset-0 bg-black/35" />
 
-        <div className="relative container mx-auto px-6 text-cream">
-          <p className="reveal text-xs tracking-[0.3em] uppercase text-bamboo-soft mb-6">
+        <div className="relative container mx-auto px-6 py-24 text-cream md:py-0">
+          <p className="reveal text-xs tracking-[0.3em] uppercase text-bamboo-soft mb-4 md:mb-6">
             Studio Arsitektur · Est. 2013
           </p>
-          <h1 className="reveal reveal-delay-1 font-display text-5xl md:text-7xl lg:text-7xl max-w-4xl text-balance leading-[1.05]">
+          <h1 className="reveal reveal-delay-1 font-display text-4xl sm:text-5xl md:text-7xl lg:text-7xl max-w-4xl text-balance leading-[1.05]">
             Ruang yang tenang, <em className="text-bamboo-soft not-italic">tahan waktu</em>.
           </h1>
-          <p className="reveal reveal-delay-2 mt-6 max-w-xl text-cream/85 text-lg">
+          <p className="reveal reveal-delay-2 mt-5 max-w-xl text-base text-cream/85 sm:text-lg md:mt-6">
             Kami merancang arsitektur dan interior yang berakar pada konteks, material yang jujur,
             dan kehidupan yang Anda jalani setiap hari.
           </p>
-          <div className="reveal reveal-delay-3 mt-10 flex flex-wrap gap-4">
+          <div className="reveal reveal-delay-3 mt-8 flex flex-wrap gap-3 md:mt-10 md:gap-4">
             <a
               href={waLink("Halo RN_ARCHITECT, saya ingin berkonsultasi proyek.")}
               target="_blank"
@@ -99,10 +99,10 @@ export default async function HomePage() {
               Lihat Portofolio <ArrowRight className="h-4 w-4" />
             </Link>
           </div>
-          <div className="reveal reveal-delay-4 mt-20 grid grid-cols-2 md:grid-cols-4 gap-8 max-w-3xl">
+          <div className="reveal reveal-delay-4 mt-12 grid max-w-3xl grid-cols-2 gap-x-8 gap-y-5 md:mt-20 md:grid-cols-4 md:gap-8">
             {stats.map((s) => (
               <div key={s.l}>
-                <div className="font-display text-4xl md:text-5xl text-cream">{s.v}</div>
+                <div className="font-display text-3xl text-cream md:text-5xl">{s.v}</div>
                 <div className="text-xs uppercase tracking-widest text-cream/70 mt-1">{s.l}</div>
               </div>
             ))}
@@ -277,8 +277,8 @@ export default async function HomePage() {
 
       {/* CTA */}
       <section className="py-20">
-        <div className="container mx-auto px-40">
-          <div className="rounded-2xl bg-gradient-bamboo text-primary-foreground p-12 md:p-20 text-center shadow-elegant">
+        <div className="container mx-auto px-6 md:px-40">
+          <div className="rounded-2xl bg-gradient-bamboo p-8 text-center text-primary-foreground shadow-elegant md:p-20">
             <Award className="h-10 w-10 mx-auto mb-6 text-bamboo-soft" />
             <h2 className="text-4xl md:text-5xl text-cream max-w-3xl mx-auto text-balance">
               Mari rancang ruang yang Anda layak tinggali.

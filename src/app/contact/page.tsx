@@ -52,7 +52,7 @@ export default function ContactPage() {
 </section>
 
       <section className="py-16 md:py-20">
-        <div className="container mx-auto px-50">
+        <div className="container mx-auto px-6 md:px-50">
           <form onSubmit={onSubmit} className="lg:col-span-3 p-8 md:p-10 rounded-lg bg-card border border-border space-y-5 shadow-soft">
             <h2 className="text-2xl">Kirim pesan</h2>
             <div className="grid sm:grid-cols-2 gap-4">

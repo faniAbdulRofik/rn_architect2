@@ -5,7 +5,7 @@ import { WhatsAppFloat } from "./WhatsAppFloat";
 
 export function SiteLayout({ children }: { children: ReactNode }) {
   return (
-    <div className="min-h-screen flex flex-col bg-background">
+    <div className="min-h-screen flex flex-col overflow-x-clip bg-background">
       <Header />
       <main className="flex-1">{children}</main>
       <Footer />
