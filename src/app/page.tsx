@@ -17,13 +17,6 @@ const services = [
   { icon: Hammer, title: "Build & Supervision", desc: "Pengawasan pembangunan agar hasil sesuai dengan visi desain." },
 ];
 
-const stats = [
-  { v: "120+", l: "Proyek Selesai" },
-  { v: "12", l: "Tahun Pengalaman" },
-  { v: "100%", l: "Klien Puas" },
-  { v: "24", l: "Penghargaan" },
-];
-
 const testimonials = [
   { name: "Andini & Reza", role: "Pemilik Rumah, Bandung", quote: "Hasilnya melampaui ekspektasi. Setiap sudut rumah terasa dipikirkan dengan hati." },
   { name: "PT. Lentera Karya", role: "Klien Korporat", quote: "Profesional, detail, dan komunikatif. Kami percayakan tiga proyek kantor kami." },
@@ -31,22 +24,37 @@ const testimonials = [
 ];
 
 export default async function HomePage() {
-  // Load featured projects and products from database
-  const { data: featuredProjects } = await supabase
-    .from("projects")
-    .select("slug, title, category, location, year, cover_image, images")
-    .eq("status", "published")
-    .eq("is_featured", true)
-    .order("created_at", { ascending: false })
-    .limit(2);
+  const [
+    { data: featuredProjects },
+    { data: featuredProducts },
+    { count: publishedProjectCount },
+  ] = await Promise.all([
+    supabase
+      .from("projects")
+      .select("slug, title, category, location, year, cover_image, images")
+      .eq("status", "published")
+      .eq("is_featured", true)
+      .order("created_at", { ascending: false })
+      .limit(2),
+    supabase
+      .from("products")
+      .select("slug, title, category, images, price_label")
+      .eq("status", "published")
+      .eq("is_featured", true)
+      .order("created_at", { ascending: false })
+      .limit(3),
+    supabase
+      .from("projects")
+      .select("id", { count: "exact", head: true })
+      .eq("status", "published"),
+  ]);
 
-  const { data: featuredProducts } = await supabase
-    .from("products")
-    .select("slug, title, category, images, price_label")
-    .eq("status", "published")
-    .eq("is_featured", true)
-    .order("created_at", { ascending: false })
-    .limit(3);
+  const stats = [
+    { v: String(publishedProjectCount ?? 0), l: "Proyek Selesai" },
+    { v: "12", l: "Tahun Pengalaman" },
+    { v: "100%", l: "Klien Puas" },
+    { v: "24", l: "Penghargaan" },
+  ];
 
   return (
     <SiteLayout>
