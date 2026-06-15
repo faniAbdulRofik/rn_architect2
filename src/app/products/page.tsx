@@ -63,8 +63,8 @@ export default function ProductsPage() {
 
       {/* COMPACT STICKY FILTER */}
       <div className="border-b border-border/70">
-        <div className="container mx-auto flex flex-col items-stretch gap-3 px-6 py-4 md:flex-row md:items-center md:justify-between md:gap-0">
-          <div className="flex flex-wrap gap-1.5 -mx-1 overflow-x-auto no-scrollbar">
+        <div className="container mx-auto px-6 py-4 flex flex-wrap gap-4 items-center justify-between">
+          <div className="flex flex-wrap gap-1.5 overflow-x-auto no-scrollbar">
             {categories.map((c) => (
               <button
                 key={c}
@@ -91,7 +91,7 @@ export default function ProductsPage() {
         </div>
       </div>
 
-      <section className="pt-6 pb-12 md:py-8">
+      <section className="py-8">
         <div className="container mx-auto px-6">
           {loading ? (
             <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">

@@ -27,7 +27,7 @@ const timeline = [
 export default function AboutPage() {
   return (
     <SiteLayout>
-      <section className="pt-32 md:pt-20 pb-10 bg-gradient-warm">
+      <section className="bg-gradient-warm pt-24 pb-6 md:pt-20 md:pb-10">
         <div className="container mx-auto px-6 text-center">
           <h1 className="text-5xl md:text-6xl text-balance leading-tight max-w-4xl mx-auto">
             Studio arsitektur yang {" "}

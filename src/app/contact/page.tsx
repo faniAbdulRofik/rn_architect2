@@ -43,7 +43,7 @@ export default function ContactPage() {
 
   return (
     <SiteLayout>
-      <section className="pt-32 md:pt-20 pb-10 bg-gradient-warm">
+      <section className="bg-gradient-warm pt-24 pb-6 md:pt-20 md:pb-10">
   <div className="container mx-auto px-6 max-w-4xl text-center">
     <h1 className="text-4xl md:text-6xl text-balance leading-tight">
       Mari mulai percakapan
@@ -51,7 +51,7 @@ export default function ContactPage() {
   </div>
 </section>
 
-      <section className="py-16 md:py-20">
+      <section className="py-8 md:py-20">
         <div className="container mx-auto px-6 md:px-50">
           <form onSubmit={onSubmit} className="lg:col-span-3 p-8 md:p-10 rounded-lg bg-card border border-border space-y-5 shadow-soft">
             <h2 className="text-2xl">Kirim pesan</h2>

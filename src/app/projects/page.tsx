@@ -52,7 +52,7 @@ export default function ProjectsPage() {
 
   return (
     <SiteLayout>
-      <section className="pt-32 md:pt-20 pb-10 bg-gradient-warm">
+      <section className="bg-gradient-warm pt-24 pb-6 md:pt-20 md:pb-10">
         <div className="container mx-auto px-6 max-w-4xl text-center">
           <h1 className="text-4xl md:text-6xl text-balance leading-tight">
             Proyek terpilih
